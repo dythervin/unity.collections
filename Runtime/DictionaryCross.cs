@@ -24,13 +24,21 @@ namespace Dythervin.Collections
         public TMain this[T key]
         {
             get => _dictionaryImplementation1[key];
-            set => _dictionaryImplementation1[key] = value;
+            set
+            {
+                _dictionaryImplementation1[key] = value;
+                _dictionaryImplementation[value] = key;
+            }
         }
 
         public T this[TMain key]
         {
             get => _dictionaryImplementation[key];
-            set => _dictionaryImplementation[key] = value;
+            set
+            {
+                _dictionaryImplementation[key] = value;
+                _dictionaryImplementation1[value] = key;
+            }
         }
 
         public int Count => _dictionaryImplementation.Count;
