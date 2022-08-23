@@ -59,7 +59,8 @@ namespace Dythervin.Collections
             return Remove(value);
         }
 
-        public int Count => values.Count + _toAdd.Count - _toRemove.Count;
+        public int Count => values.Count;
+        public int BufferDelta => _toAdd.Count - _toRemove.Count;
         public bool IsReadOnly => values.IsReadOnly;
 
         public bool Contains(T value)
