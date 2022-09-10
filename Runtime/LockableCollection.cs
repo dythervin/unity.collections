@@ -11,38 +11,17 @@ namespace Dythervin.Collections
         where TContainer : ICollection<T>, new()
     {
 #if ODIN_INSPECTOR
-        [ShowInInspector] [ReadOnly]
+        [ShowInInspector]
+        [ReadOnly]
+#endif
+        private readonly Dictionary<T, bool> _buffer = new Dictionary<T, bool>();
+#if ODIN_INSPECTOR
+        [ShowInInspector]
+        [ReadOnly]
 #endif
         public readonly TContainer values = new TContainer();
 
-        private bool _isLocked;
-
-#if ODIN_INSPECTOR
-        [ShowInInspector] [ReadOnly]
-#endif
-        private readonly HashSet<T> _toAdd = new HashSet<T>();
-
-#if ODIN_INSPECTOR
-        [ShowInInspector] [ReadOnly]
-#endif
-        private readonly HashSet<T> _toRemove = new HashSet<T>();
-
-        public event Action OnChangesApplied;
-
-        public bool IsLocked => _isLocked;
-
-
-        public void Unlock() => Lock(false);
-
-        public void Lock(bool value = true)
-        {
-            if (value == _isLocked)
-                return;
-
-            _isLocked = value;
-            if (!value)
-                ApplyChanges();
-        }
+        public bool IsLocked { get; private set; }
 
         void ICollection<T>.Add(T value)
         {
@@ -60,13 +39,11 @@ namespace Dythervin.Collections
         }
 
         public int Count => values.Count;
-        public int BufferDelta => _toAdd.Count - _toRemove.Count;
         public bool IsReadOnly => values.IsReadOnly;
 
         public bool Contains(T value)
         {
-            return !_toRemove.Contains(value)
-                   && (values.Contains(value) || _toAdd.Contains(value));
+            return values.Contains(value);
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
@@ -79,70 +56,66 @@ namespace Dythervin.Collections
             return ((IEnumerable)values).GetEnumerator();
         }
 
-        public bool ToRemove(T value)
+        public void Clear()
         {
-            return _toRemove.Contains(value);
+            values.Clear();
+            _buffer.Clear();
         }
 
         public void Add(T value)
         {
-            if (_isLocked)
-                AddBuffer(value);
+            if (IsLocked)
+                _buffer[value] = true;
             else
                 values.Add(value);
         }
 
-        public bool Remove(T value)
+        public bool IsToRemove(T value)
         {
-            return _isLocked ? RemoveBuffer(value) : values.Remove(value);
+            return _buffer.TryGetValue(value, out bool data) && data;
         }
 
-        public void Clear()
+        public void Lock(bool value = true)
         {
-            values.Clear();
-            _toAdd.Clear();
-            _toRemove.Clear();
+            if (value == IsLocked)
+                return;
+
+            IsLocked = value;
+            if (!value)
+                ApplyChanges();
+        }
+
+        public event Action OnChangesApplied;
+
+        public bool Remove(T value)
+        {
+            if (!IsLocked)
+                return values.Remove(value);
+
+            _buffer[value] = false;
+            return false;
+        }
+
+        public void Unlock()
+        {
+            Lock(false);
         }
 
         private void ApplyChanges()
         {
-            if (_toRemove.Count == 0 && _toAdd.Count == 0)
+            if (_buffer.Count == 0)
                 return;
 
-            if (_toRemove.Count > 0)
+            foreach (var pair in _buffer)
             {
-                foreach (T prioritized in _toRemove)
-                {
-                    values.Remove(prioritized);
-                }
-
-                _toRemove.Clear();
+                if (pair.Value)
+                    values.Add(pair.Key);
+                else
+                    values.Remove(pair.Key);
             }
 
-            if (_toAdd.Count > 0)
-            {
-                foreach (T prioritized in _toAdd)
-                {
-                    values.Add(prioritized);
-                }
-
-                _toAdd.Clear();
-            }
-
+            _buffer.Clear();
             OnChangesApplied?.Invoke();
-        }
-
-        private void AddBuffer(T value)
-        {
-            if (_toRemove.Remove(value))
-                return;
-
-            _toAdd.Add(value);
-        }
-
-        private bool RemoveBuffer(T value)
-        {
-            return _toAdd.Remove(value) || _toRemove.Add(value);
         }
     }
 }
