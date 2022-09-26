@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 namespace Dythervin.Collections
 {
-    public class HashList<T> : ICollection<T>, IEnumerable<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IEnumerable, IList,
+    public class HashList<T> : ICollection<T>, IEnumerable<T>, IList<T>, IReadOnlyHashList<T>, ICollection, IEnumerable,
+        IList,
         IIndexer<int, T>
     {
         private readonly List<T> _list;
@@ -16,12 +17,12 @@ namespace Dythervin.Collections
             _set = new HashSet<T>(_list);
         }
 
-        public HashList(int capacity)
+        public HashList(int capacity = 16)
         {
             _list = new List<T>(capacity);
             _set = new HashSet<T>(
 #if UNITY_2021_3_OR_NEWER
-                    capacity
+                capacity
 #endif
             );
         }

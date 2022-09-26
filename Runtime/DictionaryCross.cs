@@ -4,7 +4,7 @@ using Dythervin.Core.Extensions;
 
 namespace Dythervin.Collections
 {
-    public class DictionaryCross<TMain, T> : IDictionary<TMain, T>, IIndexer<TMain, T>
+    public class DictionaryCross<TMain, T> : IDictionary<TMain, T>, IIndexer<TMain, T>, IReadOnlyDictionary<TMain, T>
     {
         private readonly Dictionary<TMain, T> _dictionaryImplementation;
         private readonly Dictionary<T, TMain> _dictionaryImplementation1;
@@ -40,6 +40,10 @@ namespace Dythervin.Collections
                 _dictionaryImplementation1[value] = key;
             }
         }
+
+        IEnumerable<TMain> IReadOnlyDictionary<TMain, T>.Keys => Keys;
+
+        IEnumerable<T> IReadOnlyDictionary<TMain, T>.Values => Values;
 
         public int Count => _dictionaryImplementation.Count;
 
