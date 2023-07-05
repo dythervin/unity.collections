@@ -1,0 +1,16 @@
+{
+  "name": "com.dythervin.unity.collections",
+  "displayName": "collections",
+  "version": "1.0.2",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "keywords": [],
+  "author": {
+    "name": "Dythervin",
+    "email": "dythervin@gmail.com",
+    "url": "https://github.com/dythervin"
+  },
+  "dependencies": {
+    "com.dythervin.unity.core": "1.0.2"
+  }
+}

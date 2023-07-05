@@ -1,0 +1,20 @@
+{
+    "name": "Dythervin.Collections.Editor",
+    "rootNamespace": "Dythervin.Collections.Editor",
+    "references": [
+        "GUID:0d2722be3221441990b3d439a49d3d00",
+        "GUID:0031e864adfd431f8c8176db3609a3cb",
+        "GUID:91604c9839ab4f65a1701aa5b8a66b9f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
