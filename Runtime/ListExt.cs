@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
+using Dythervin.Core.Extensions;
 
 namespace Dythervin.Collections
 {
@@ -68,7 +69,6 @@ namespace Dythervin.Collections
 
 #endregion
 
-
         public bool ReplaceAt(int index, T value, out T popped)
         {
             popped = _list[index];
@@ -127,6 +127,26 @@ namespace Dythervin.Collections
         protected virtual void RemoveAtInner(int index, T item)
         {
             _list.RemoveAt(index);
+        }
+
+        public void Sort()
+        {
+            _list.Sort();
+        }
+
+        public void Sort(IComparer<T> comparer)
+        {
+            _list.Sort(comparer);
+        }
+
+        public void Sort(Comparison<T> comparison)
+        {
+            _list.Sort(comparison);
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            _list.Sort(index, count, comparer);
         }
 
 #region IList
@@ -200,7 +220,6 @@ namespace Dythervin.Collections
                     for (int i = 0; i < count; i++)
                         OnRemoved?.Invoke(temp[i]);
 
-
                 OnChanged?.Invoke();
             }
             finally
@@ -245,5 +264,10 @@ namespace Dythervin.Collections
         }
 
 #endregion
+
+        public virtual void EnsureCapacity(int capacity)
+        {
+            _list.EnsureCapacity(capacity);
+        }
     }
 }

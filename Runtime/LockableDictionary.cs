@@ -15,6 +15,7 @@ namespace Dythervin.Collections
         [ReadOnly]
 #endif
         public readonly Dictionary<TKey, TValue> container = new();
+
         private readonly Dictionary<TKey, (TValue value, bool toAdd)> _buffer = new();
 
 #endregion
@@ -45,6 +46,16 @@ namespace Dythervin.Collections
         {
             return container.TryGetValue(pair.Key, out TValue value) &&
                    EqualityComparer<TValue>.Default.Equals(value, pair.Value);
+        }
+
+        public bool ContainsKey(TKey key)
+        {
+            return container.ContainsKey(key);
+        }
+
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            return container.TryGetValue(key, out value);
         }
 
         protected override void ContainerAdd(KeyValuePair<TKey, TValue> value)

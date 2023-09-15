@@ -27,12 +27,12 @@ namespace Dythervin.Collections
 
         public static int GetKeyIndex(this ICollisionMatrix matrix, int a, int b)
         {
-            return GetKeyIndex(a, b, matrix.KeyCount, matrix.SelfIntersect);
+            return GetKeyIndex(a, b, matrix.CappedKeyCount, matrix.SelfIntersect);
         }
 
         public static int GetRowLength(this ICollisionMatrix matrix, int arrayIndex)
         {
-            return GetRowLength(matrix.KeyCount, arrayIndex);
+            return GetRowLength(matrix.CappedKeyCount, arrayIndex);
         }
 
         public static int GetKeyIndex(int a, int b, int length, bool selfIntersection)
@@ -44,7 +44,7 @@ namespace Dythervin.Collections
                 b--;
             }
 
-            return b + length * a - CollisionMatrixHelper.Triangulate(a);
+            return b + length * a - Triangulate(a);
         }
 
         public static int Triangulate(int i)

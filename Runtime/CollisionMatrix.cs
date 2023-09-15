@@ -11,7 +11,7 @@ namespace Dythervin.Collections
 
         bool SelfIntersect { get; }
 
-        int KeyCount { get; }
+        int CappedKeyCount { get; }
 
         object this[int a, int b] { get; }
 
@@ -32,6 +32,8 @@ namespace Dythervin.Collections
 #region Properties
 
         IReadOnlyList<T> InternalArray { get; }
+
+        int KeyCount { get; }
 
         new T this[int a, int b] { get; }
 
@@ -54,8 +56,10 @@ namespace Dythervin.Collections
 
         private const bool SelfIntersectionDefault = false;
         [SerializeField] private T[] array;
+
         [SerializeField] [HideInInspector]
         private bool selfIntersect;
+
         private int _keyCount = -1;
 
 #endregion
@@ -68,12 +72,10 @@ namespace Dythervin.Collections
             set
             {
                 if (selfIntersect == value)
-                {
                     return;
-                }
 
                 selfIntersect = value;
-                SetSize(KeyCount, value);
+                SetSize(CappedKeyCount, value);
             }
         }
 
@@ -82,18 +84,16 @@ namespace Dythervin.Collections
             get
             {
                 if (_keyCount != -1)
-                {
                     return _keyCount;
-                }
 
                 if (array == null)
-                {
                     return 0;
-                }
 
-                return _keyCount = CollisionMatrixHelper.Untriangulate(array.Length);
+                return _keyCount = CollisionMatrixHelper.Untriangulate(array.Length) + (selfIntersect ? 0 : 1);
             }
         }
+
+        public int CappedKeyCount => KeyCount + (selfIntersect ? 0 : -1);
 
         public IReadOnlyList<T> InternalArray => array;
 
@@ -120,10 +120,10 @@ namespace Dythervin.Collections
             selfIntersect = selfIntersection;
         }
 
-        public CollisionMatrix([NotNull] IReadOnlyCollisionMatrix<T> matrix,
-            bool selfIntersection = SelfIntersectionDefault)
+        public CollisionMatrix([NotNull] IReadOnlyCollisionMatrix<T> matrix)
         {
-            SetSize(matrix.KeyCount, selfIntersection);
+            SetSize(matrix.KeyCount, matrix.SelfIntersect);
+            CopyFrom(matrix);
         }
 
 #endregion
@@ -135,24 +135,18 @@ namespace Dythervin.Collections
 
         public void SetSize(int count, bool selfIntersect)
         {
+            Debug.Assert(count > 1);
+            if (count == KeyCount && this.selfIntersect == selfIntersect)
+                return;
+
             bool prevSelfIntersect = SelfIntersect;
             this.selfIntersect = selfIntersect;
-            if (!selfIntersect)
-            {
-                count--;
-            }
 
-            if (count == KeyCount)
-            {
-                return;
-            }
-
-            Debug.Assert(count > 0);
             var prevArray = array;
-            int prevCount = KeyCount;
-
-            array = new T[CollisionMatrixHelper.Triangulate(count)];
+            int prevCount = CappedKeyCount;
             _keyCount = count;
+
+            array = new T[CollisionMatrixHelper.Triangulate(CappedKeyCount)];
 
             if (prevArray != null)
             {
@@ -162,19 +156,19 @@ namespace Dythervin.Collections
 
         public void CopyFrom(IReadOnlyCollisionMatrix<T> matrix)
         {
-            CopyFrom(matrix.InternalArray, matrix.KeyCount, matrix.SelfIntersect);
+            CopyFrom(matrix.InternalArray, matrix.CappedKeyCount, matrix.SelfIntersect);
         }
 
         public void CopyFrom(IReadOnlyList<T> source, int sourceKeyCount, bool sourceSelfIntersect)
         {
-            int max = Mathf.Min(sourceKeyCount, KeyCount);
+            int max = Mathf.Min(sourceKeyCount, CappedKeyCount);
             int startIndex = SelfIntersect && sourceSelfIntersect ? 0 : 1;
 
             for (int a = 0; a < max; a++)
             {
                 for (int b = a + startIndex; b < max + startIndex; b++)
                 {
-                    int rowIndex = CollisionMatrixHelper.GetKeyIndex(a, b, KeyCount, SelfIntersect);
+                    int rowIndex = CollisionMatrixHelper.GetKeyIndex(a, b, CappedKeyCount, SelfIntersect);
                     int sourceRowIndex = CollisionMatrixHelper.GetKeyIndex(a, b, sourceKeyCount, sourceSelfIntersect);
 
                     array[rowIndex] = source[sourceRowIndex];

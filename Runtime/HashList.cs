@@ -22,7 +22,7 @@ namespace Dythervin.Collections
         public HashList(int capacity = 16) : base(capacity)
         {
             _set = new HashSet<T>(
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_1_OR_NEWER
                 capacity
 #endif
             );
@@ -90,5 +90,11 @@ namespace Dythervin.Collections
         }
 
 #endregion
+
+        public override void EnsureCapacity(int capacity)
+        {
+            base.EnsureCapacity(capacity);
+            _set.EnsureCapacity(capacity);
+        }
     }
 }

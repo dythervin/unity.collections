@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Dythervin.Core.Extensions;
 
@@ -7,7 +8,8 @@ namespace Dythervin.Collections
     public class DictionaryCross<TMain, T> : IDictionary<TMain, T>,
         IIndexer<TMain, T>,
         IReadOnlyDictionary<TMain, T>,
-        IEnumerable<Dictionary<TMain, T>.Enumerator, KeyValuePair<TMain, T>>
+        IEnumerable<Dictionary<TMain, T>.Enumerator, KeyValuePair<TMain, T>>,
+        ICollection
     {
 #region Fields
 
@@ -22,7 +24,16 @@ namespace Dythervin.Collections
 
         public Dictionary<TMain, T>.ValueCollection Values => _dictionaryImplementation.Values;
 
+        void ICollection.CopyTo(Array array, int index)
+        {
+            ((ICollection)_dictionaryImplementation).CopyTo(array, index);
+        }
+
         public int Count => _dictionaryImplementation.Count;
+
+        bool ICollection.IsSynchronized => ((ICollection)_dictionaryImplementation).IsSynchronized;
+
+        object ICollection.SyncRoot => ((ICollection)_dictionaryImplementation).SyncRoot;
 
         public T this[TMain key]
         {
@@ -194,5 +205,11 @@ namespace Dythervin.Collections
         }
 
 #endregion
+
+        public void EnsureCapacity(int capacity)
+        {
+            _dictionaryImplementation.EnsureCapacity(capacity);
+            _dictionaryImplementation1.EnsureCapacity(capacity);
+        }
     }
 }

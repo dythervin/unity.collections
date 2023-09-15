@@ -34,7 +34,7 @@ namespace Game
 
         private static float LineHeight => EditorGUIUtility.singleLineHeight;
 
-        private int Count => _collisionMatrix?.KeyCount ?? 0;
+        private int Count => _collisionMatrix?.CappedKeyCount ?? 0;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -110,7 +110,7 @@ namespace Game
 
         private void ResetValues()
         {
-            int count = CollisionMatrixHelper.Triangulate(_collisionMatrix.KeyCount);
+            int count = CollisionMatrixHelper.Triangulate(_collisionMatrix.CappedKeyCount);
             _wrappedArrayProperty.ClearArray();
 
             for (int i = 0; i < count; i++)

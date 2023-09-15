@@ -2,7 +2,8 @@
     "name": "Dythervin.Collections",
     "rootNamespace": "Dythervin.Collections",
     "references": [
-        "GUID:0d2722be3221441990b3d439a49d3d00"
+        "GUID:0d2722be3221441990b3d439a49d3d00",
+        "GUID:8dc57192e6514b7cbf0e53a25c177905"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
